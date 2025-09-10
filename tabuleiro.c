@@ -57,6 +57,31 @@ void iniciaPosicoes(Espaco tabuleiro[8][8]) {//inicia as peças no tabuleiro
     }
 }
 
+int *calcula_diagonal(Espaco tabuleiro[8][8], Espaco peca, int linha, int coluna, int sentido, int lado) {
+    int posicao = linha;
+    int i;
+    if (sentido<0) {
+
+    }
+    if (linha>0) {
+        i=linha-1;
+        while (i>=0) {
+            if(tabuleiro[i][coluna].peca != VAZIO) {
+                if(tabuleiro[i][coluna].cor == peca.cor) {
+                    posicao = i+1;
+                }else {
+                    posicao = i;
+                }
+                i=-1;
+            }else {
+                posicao= i;
+                i--;
+            }
+        }
+    }
+    return posicao;
+}
+
 int *calculaMovimentacao(Espaco tabuleiro[8][8], Espaco peca, int linha, int coluna) {
     if (peca.peca == PEAO) {
         int *posicoes = NULL;
@@ -153,74 +178,8 @@ int *calculaMovimentacao(Espaco tabuleiro[8][8], Espaco peca, int linha, int col
             }
         }
         return posicao;
-    }else if (peca.peca == BISPO) {
-        int posicao[4]={linha,linha,coluna,coluna};//esquerda,direita,baixo,cima
-        int i;
-        if (linha>0) {
-            i=linha-1;
+    }else if (peca.peca == BISPO){
 
-            while (i>=0) {
-                if(tabuleiro[i][coluna].peca != VAZIO) {
-                    if(tabuleiro[i][coluna].cor == peca.cor) {
-                        posicao[0] = i+1;
-                    }else {
-                        posicao[0] = i;
-                    }
-                    i=-1;
-                }else {
-                    posicao[0] = i;
-                    i--;
-                }
-            }
-        }
-        if (linha<7) {
-            i=linha+1;
-            while (i<=7) {
-                if(tabuleiro[i][coluna].peca != VAZIO) {
-                    if(tabuleiro[i][coluna].cor == peca.cor) {
-                        posicao[1] = i-1;
-                    }else {
-                        posicao[1] = i;
-                    }
-                    i=8;
-                }else {
-                    posicao[1] = i;
-                    i++;
-                }
-            }
-        }
-        if (coluna>0) {
-            i=coluna-1;
-            while (i>=0) {
-                if(tabuleiro[linha][i].peca != VAZIO) {
-                    if(tabuleiro[linha][i].cor == peca.cor) {
-                        posicao[2] = i+1;
-                    }else {
-                        posicao[2] = i;
-                    }
-                    i=-1;
-                }else {
-                    posicao[2] = i;
-                    i--;
-                }
-            }
-        }
-        if (coluna<7) {
-            i=coluna+1;
-            while (i<=7) {
-                if(tabuleiro[linha][i].peca != VAZIO) {
-                    if(tabuleiro[linha][i].cor == peca.cor) {
-                        posicao[3] = i-1;
-                    }else {
-                        posicao[3] = i;
-                    }
-                    i=8;
-                }else {
-                    posicao[3] = i;
-                    i++;
-                }
-            }
-        }
     }
 }
 
