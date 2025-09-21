@@ -99,6 +99,27 @@ void calculaMovimentoEmLinha(Espaco tabuleiro[8][8], Espaco peca, int linha, int
     }
 }
 
+void calculaPeao(Espaco tabuleiro[8][8], Espaco peca, int linha, int coluna, int *qtd, int dir, Coordenada ***coordenada) {
+    // Movimento para frente
+    if (linha + dir >= 0 && linha + dir < 8 && tabuleiro[linha+dir][coluna].peca == VAZIO) {
+        if (peca.movido==0) {
+            if (linha + dir >= 0 && linha + dir < 8 && tabuleiro[linha+dir][coluna].peca == VAZIO) {
+                *coordenada = malloc(sizeof(Coordenada*));
+                (*coordenada)[*qtd] = malloc(sizeof(Coordenada));
+                (*coordenada)[*qtd]->linha   = linha + dir;
+                (*coordenada)[*qtd]->coluna = coluna;
+                *qtd = *qtd + 1;
+            }
+        }else {
+            *coordenada = malloc(sizeof(Coordenada*));
+            (*coordenada)[*qtd] = malloc(sizeof(Coordenada));
+            (*coordenada)[*qtd]->linha   = linha + dir;
+            (*coordenada)[*qtd]->coluna = coluna;
+            *qtd = *qtd + 1;
+        }
+    }
+}
+
 
 
 void calculaMovimentoDiagonal(Espaco tabuleiro[8][8], Espaco peca, int linha, int coluna, int vertical, int horizontal, int indice, Coordenada ***coordenada) {
@@ -120,7 +141,7 @@ void calculaMovimentoDiagonal(Espaco tabuleiro[8][8], Espaco peca, int linha, in
     int i = linha + vertical;
     int j = coluna + horizontal;
 
-    if ((i!=auxv)&&(j!=auxh)) {
+    if ((i!=auxv)&&(j!=auxh)&&(tabuleiro[i][j].movido==1)) {
         if (*coordenada==NULL) {
             *coordenada = malloc(sizeof(Coordenada*)*4);
             for (int n =0;n<4;n++) {
@@ -169,17 +190,12 @@ void calculaCavalo(Espaco tabuleiro[8][8], Espaco peca, int linha, int coluna, i
 Coordenada **calculaMovimentacao(Espaco tabuleiro[8][8], Espaco peca, int linha, int coluna) {
     if (peca.peca == PEAO) {
         Coordenada **coordenada = NULL;
-        int qtd = 0;
+        int *qtd = malloc(sizeof(int));
+        *qtd = 0;
         int dir = (peca.cor == BRANCO) ? -1 : 1; // direção do movimento
 
-        // Movimento para frente
-        if (linha + dir >= 0 && linha + dir < 8 && tabuleiro[linha+dir][coluna].peca == VAZIO) {
-            coordenada = realloc(coordenada, sizeof(Coordenada*));
-            coordenada[qtd] = malloc(sizeof(Coordenada));
-            coordenada[qtd]->linha   = linha + dir;
-            coordenada[qtd]->coluna = coluna;
-            qtd++;
-        }
+        calculaPeao(tabuleiro,peca,linha,coluna,qtd,dir,&coordenada);
+
 
         // Movimento de captura
         for (int dj = -1; dj <= 1; dj += 2) {
@@ -187,14 +203,19 @@ Coordenada **calculaMovimentacao(Espaco tabuleiro[8][8], Espaco peca, int linha,
             int nj = coluna + dj;
             if (ni >= 0 && ni < 8 && nj >= 0 && nj < 8) {
                 if (tabuleiro[ni][nj].peca != VAZIO && tabuleiro[ni][nj].cor != peca.cor) {
-                    coordenada = realloc(coordenada, qtd*sizeof(*coordenada));
-                    coordenada[qtd] = malloc(sizeof(Coordenada));
-                    coordenada[qtd]->linha   = ni;
-                    coordenada[qtd]->coluna = nj;
-                    qtd++;
+                    if (coordenada==NULL) {
+                        coordenada = malloc(sizeof(Coordenada*));
+                    }else {
+                        coordenada = realloc(coordenada, (*qtd)*sizeof(*coordenada));
+                    }
+                    coordenada[*qtd] = malloc(sizeof(Coordenada));
+                    coordenada[*qtd]->linha   = ni;
+                    coordenada[*qtd]->coluna = nj;
+                    *qtd=*qtd + 1;
                 }
             }
         }
+        free(qtd);
         return coordenada;
     }else if (peca.peca == TORRE) {
         Coordenada **coordenada = NULL;
